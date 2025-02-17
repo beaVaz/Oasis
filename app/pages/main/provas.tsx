@@ -35,10 +35,10 @@ export default function prova() {
                     </View>
                     <View style={Estilo.boxSearch}>
                         <TextInput
-                            style={Estilo.input}
+                            style={[Estilo.input, { outlineWidth: 0 }]}
                             onChangeText={onChangeText}
                             value={text}
-                            placeholder="Pesquise o nome do curso"
+                            placeholder="Pesquise o nome da prova"
                             keyboardType="emailAddress" />
                         <View style={Estilo.imgSearch}>
                             <Pressable>

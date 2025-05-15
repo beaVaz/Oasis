@@ -90,7 +90,7 @@ export default function VestibularScreen() {
                         onPress={() => router.push('../../telaloading')}
                     >
                         <Text style={{ color: '#FFFFFF', fontFamily: 'Poppins_Bold', fontSize: 20 }}>
-                            Gerar
+                            Criar Curso
                         </Text>
                     </Pressable>
                 </View>

@@ -115,7 +115,7 @@ export default function VestibularScreen() {
                         onPress={hqandleOpenPress}
                     >
                         <Text style={{ color: '#FFFFFF', fontFamily: 'Poppins_Bold', fontSize: 20 }}>
-                            Gerar
+                            Criar Curso
                         </Text>
                     </Pressable>
                     <BottomSheet

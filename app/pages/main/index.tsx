@@ -5,9 +5,14 @@ import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 import ColorList from "../../../components/ColorList";
 import StyleOfIndex from "../../../assets/style/home";
-import Icon from 'react-native-vector-icons/FontAwesome6'; 
+import Icon from 'react-native-vector-icons/FontAwesome6';
 
 SplashScreen.preventAutoHideAsync();
+
+interface ButtonData {
+    image: any;
+    route: any;
+}
 
 export default function Index() {
     const [fontsLoaded] = useFonts({
@@ -28,13 +33,13 @@ export default function Index() {
 
     const router = useRouter();
 
-    const buttonsData = [
+    const buttonsData: ButtonData[] = [
         { image: require("@/assets/images/logotipo-provas/enem.svg"), route: "/pages/main/pagesRoot/vestibularPageEnem" },
         { image: require("@/assets/images/logotipo-provas/vunesp.svg"), route: "/pages/main/pagesRoot/vestibularPageVunesp" },
         { image: require("@/assets/images/logotipo-provas/usp.svg"), route: "/pages/main/pagesRoot/vestibularPageUsp" },
     ];
 
-    const buttonDataConcursos = [
+    const buttonDataConcursos: ButtonData[] = [
         { image: require("@/assets/images/logotipo-provas/correios.svg"), route: "/pages/main/provas" },
         { image: require("@/assets/images/logotipo-provas/bancodobrasil.svg"), route: "/pages/main/provas" },
         { image: require("@/assets/images/logotipo-provas/caixaeconomica.svg"), route: "/pages/main/provas" },

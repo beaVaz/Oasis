@@ -27,11 +27,11 @@ export default function Index() {
         }
     }, [fontsLoaded]);
 
+    const router = useRouter();
+
     if (!fontsLoaded) {
         return null;
     }
-
-    const router = useRouter();
 
     const buttonsData: ButtonData[] = [
         { image: require("@/assets/images/logotipo-provas/enem.svg"), route: "/pages/main/pagesRoot/vestibularPageEnem" },

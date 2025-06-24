@@ -9,7 +9,24 @@ export default function ContentLayout() {
       <Stack.Screen name="questoesLinguagens" options={{ title: 'Códigos e Linguagens' }} />
       <Stack.Screen name="questoesExatas" options={{ title: 'Ciências Exatas' }} />
       <Stack.Screen name="gabaritoEnem" options={{ title: 'Gabarito ENEM' }} />
-      {/* Adicione outras telas de conteúdo aqui, se necessário */}
+
+      <Stack.Screen 
+        name="LessonScreenIntroEnem" 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="LessonScreenIntroCorreios" 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="cardQuestionEnem" 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="cardQuestionCorreios" 
+        options={{ headerShown: false }} 
+      />
+
     </Stack>
   );
 }

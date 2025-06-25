@@ -13,7 +13,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useIsFocused } from '@react-navigation/native'; // Add this import
+import { useIsFocused } from '@react-navigation/native'; 
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -22,7 +22,7 @@ import styles from '../../../assets/style/EditProfile'
 
 const EditProfileScreen = () => {
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState(''); // Adicionado estado para o email
+  const [email, setEmail] = useState(''); 
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUsername, setCurrentUsername] = useState('');
@@ -30,7 +30,7 @@ const EditProfileScreen = () => {
   const [imageUri, setImageUri] = useState<string | null>(null);
 
   const router = useRouter();
-  const isFocused = useIsFocused(); // Add this line
+  const isFocused = useIsFocused(); 
 
   useEffect(() => {
     const loadData = async () => {
@@ -44,9 +44,9 @@ const EditProfileScreen = () => {
             const response = await axios.get(`${API_BASE_URL}/user/profile`, {
               headers: { Authorization: `Bearer ${token}` },
             });
-            // console.log('Resposta de /api/user/profile:', response.data); // Pode remover ou manter para debug
+           
 
-            if (response.data?.name) { // Alterado de username para name
+            if (response.data?.name) { 
               setUsername(response.data.name);
               setCurrentUsername(response.data.name);
             } else {
@@ -54,11 +54,11 @@ const EditProfileScreen = () => {
               Alert.alert("Erro", "Não foi possível carregar o nome de usuário.");
             }
 
-            if (response.data?.email) { // Adicionado para carregar o email
+            if (response.data?.email) { 
               setEmail(response.data.email);
             } else {
               console.log("Campo 'email' não encontrado na resposta de /api/user/profile.");
-              // Opcional: Alertar se o email não for encontrado, ou apenas deixar em branco
+             
             }
           } catch (apiError) {
             console.error("Erro ao buscar perfil:", apiError);
@@ -81,10 +81,10 @@ const EditProfileScreen = () => {
       }
     };
 
-    if (isFocused) { // Only run loadData if the screen is focused
+    if (isFocused) { 
       loadData();
     }
-  }, [isFocused, router]); // Add isFocused to the dependency array
+  }, [isFocused, router]); 
 
   const handleSave = async () => {
     const trimmedUsername = username.trim();
@@ -152,9 +152,7 @@ const EditProfileScreen = () => {
     }
   };
 
-  const handleLogout = async () => {
-    // Set loading state true if you have a visual indicator for logout process
-    // setIsLoadingAuth(true); 
+  const handleLogout = async () => { 
     try {
       await AsyncStorage.removeItem('userToken');
       setIsAuthenticated(false); // Update auth state
@@ -163,8 +161,6 @@ const EditProfileScreen = () => {
       console.error("Error during logout:", error);
       Alert.alert("Erro", "Não foi possível fazer logout. Tente novamente.");
     } finally {
-      // Ensure loading state is reset if it was used
-      // setIsLoadingAuth(false);
     }
   };
 
@@ -240,10 +236,10 @@ const EditProfileScreen = () => {
             {/* Adicionado para exibir o email */}
             <Text style={styles.label}>Email:</Text>
             <TextInput
-              style={[styles.input, styles.readOnlyInput]} // Adicionado estilo para campo somente leitura
+              style={[styles.input, styles.readOnlyInput]}
               value={email}
               editable={false}
-              placeholder="Email" // Pode ser "Email não disponível" se preferir
+              placeholder="Email" 
               placeholderTextColor="#999"
             />
 

@@ -147,7 +147,7 @@ const UserDashboard = () => {
             <Text style={styles.loadingText}>Carregando perfil...</Text>
           </View>
         ) : (
-          <> {/* <--- FRAGMENT ABERTO */} 
+          <> 
             <View style={styles.profileSection}>
               <Image 
                 source={profilePicUri ? { uri: profilePicUri } : require('@/assets/images/User.png')} 

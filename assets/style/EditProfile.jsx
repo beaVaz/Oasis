@@ -9,7 +9,7 @@ export default StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20, // Added padding for better text visibility
+    padding: 20, 
   },
   header: {
     flexDirection: 'row',
@@ -40,20 +40,20 @@ export default StyleSheet.create({
   avatarPlaceholder: {
     width: 100, 
     height: 100, 
-    borderRadius: 50, // Match avatar styling
-    justifyContent: 'center', // Center icon and text
+    borderRadius: 50, 
+    justifyContent: 'center', 
     alignItems: 'center',
-    backgroundColor: '#EFEFEF', // Light background for placeholder
+    backgroundColor: '#EFEFEF', 
   },
   changePhotoText: {
     fontSize: 14,
-    color: '#888', // Keep color as is or adjust if needed
+    color: '#888', 
     marginTop: 8,
   },
   container: {
-    flex: 1, // Allow container to fill remaining space
+    flex: 1, 
     padding: 20,
-    justifyContent: 'flex-start', // Align items to the start
+    justifyContent: 'flex-start', 
   },
   label: {
     fontSize: 16,
@@ -69,6 +69,17 @@ export default StyleSheet.create({
     paddingHorizontal: 15,
     fontSize: 16,
     backgroundColor: '#FFFFFF',
+  },
+  readOnlyInput: { 
+    backgroundColor: '#f0f0f0', 
+    color: '#555', 
+    height: 50,
+    borderColor: '#CCCCCC',
+    borderWidth: 1,
+    borderRadius: 8,
+    marginBottom: 20,
+    paddingHorizontal: 15,
+    fontSize: 16,
   },
   logoutButtonContainer: {
     marginTop: 15, 
@@ -87,7 +98,7 @@ export default StyleSheet.create({
     marginBottom: 20,
   },
   centeredContent: {
-    flex: 1, // Ensure it takes full height to center content
+    flex: 1, 
     justifyContent: 'center',
     alignItems: 'center',
   },

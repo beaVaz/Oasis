@@ -22,6 +22,7 @@ import styles from '../../../assets/style/EditProfile'
 
 const EditProfileScreen = () => {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState(''); // Adicionado estado para o email
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUsername, setCurrentUsername] = useState('');
@@ -43,12 +44,21 @@ const EditProfileScreen = () => {
             const response = await axios.get(`${API_BASE_URL}/user/profile`, {
               headers: { Authorization: `Bearer ${token}` },
             });
-            if (response.data?.username) {
-              setUsername(response.data.username);
-              setCurrentUsername(response.data.username);
-              // Se quiser carregar imagem do backend, adicione aqui
+            // console.log('Resposta de /api/user/profile:', response.data); // Pode remover ou manter para debug
+
+            if (response.data?.name) { // Alterado de username para name
+              setUsername(response.data.name);
+              setCurrentUsername(response.data.name);
             } else {
+              console.log("Campo 'name' não encontrado na resposta de /api/user/profile.");
               Alert.alert("Erro", "Não foi possível carregar o nome de usuário.");
+            }
+
+            if (response.data?.email) { // Adicionado para carregar o email
+              setEmail(response.data.email);
+            } else {
+              console.log("Campo 'email' não encontrado na resposta de /api/user/profile.");
+              // Opcional: Alertar se o email não for encontrado, ou apenas deixar em branco
             }
           } catch (apiError) {
             console.error("Erro ao buscar perfil:", apiError);
@@ -226,6 +236,17 @@ const EditProfileScreen = () => {
               autoCapitalize="none"
               editable={!isSaving && !isLoadingAuth}
             />
+
+            {/* Adicionado para exibir o email */}
+            <Text style={styles.label}>Email:</Text>
+            <TextInput
+              style={[styles.input, styles.readOnlyInput]} // Adicionado estilo para campo somente leitura
+              value={email}
+              editable={false}
+              placeholder="Email" // Pode ser "Email não disponível" se preferir
+              placeholderTextColor="#999"
+            />
+
             <Button
               title={isSaving ? "Salvando..." : "Salvar Alterações"}
               onPress={handleSave}

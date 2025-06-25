@@ -56,7 +56,7 @@ export default function MainTabLayout() {
                             // Re-check auth status directly on press for immediate accuracy
                             AsyncStorage.getItem('userToken').then(token => {
                                 if (token) {
-                                    router.push('/pages/main/EditProfileScreen');
+                                    router.push('/pages/main/perfilUsuario');
                                 } else {
                                     router.push('/pages/main/login');
                                 }

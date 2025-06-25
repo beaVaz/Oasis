@@ -16,15 +16,11 @@ export default function MainTabLayout() {
             setIsAuthenticated(!!token);
         };
 
-        // Check auth status when the tab navigator gains focus or on initial mount.
-        // isFocused is true on initial mount if it's the first screen.
-        if (isFocused) { 
+        // Check auth status when the tab navigator gains focus.
+        // This also covers the initial mount if the screen is focused initially.
+        if (isFocused) {
             checkAuthStatus();
         }
-        // An initial check regardless of focus state might be redundant if isFocused covers mount,
-        // but can be kept for certainty depending on navigation structure.
-        // For robust tab behavior, the onPress check is key.
-        checkAuthStatus(); 
     }, [isFocused]); // Rerun when isFocused changes
 
     return (

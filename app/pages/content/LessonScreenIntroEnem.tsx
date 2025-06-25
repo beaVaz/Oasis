@@ -49,16 +49,7 @@ const LessonScreen: React.FC = () => {
     "Poppins-SemiBold": require("@/assets/fonts/poppins/Poppins-SemiBold.ttf"),
   });
 
-  useEffect(() => {
-    if (fontsLoaded) {
-
-    }
-  }, [fontsLoaded]);
-
-  if (!fontsLoaded) {
-    return null;
-  }
-
+  // Todos os Hooks são chamados aqui, no topo e incondicionalmente.
   const videoRef = useRef<Video>(null);
   const [status, setStatus] = useState<AVPlaybackStatus | null>(null);
 
@@ -113,6 +104,22 @@ const LessonScreen: React.FC = () => {
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const [lessonCompleted, setLessonCompleted] = useState<boolean>(false);
   const [xpGained, setXpGained] = useState<number>(0);
+
+  // O useEffect para lidar com fontsLoaded permanece, pois sua lógica interna é condicional,
+  // mas a chamada do useEffect em si é incondicional.
+  useEffect(() => {
+    if (fontsLoaded) {
+      // Alguma lógica que dependa das fontes carregadas pode vir aqui,
+      // por exemplo, analytics ou alguma configuração inicial baseada em fontes.
+      // No seu caso original, estava vazio, o que é ok.
+    }
+  }, [fontsLoaded]);
+
+  // Agora, a lógica de retorno condicional pode vir depois de todos os Hooks.
+  if (!fontsLoaded) {
+    // Pode-se retornar um loader aqui em vez de null para melhor UX
+    return <View style={styles.centeredScreen}><Text>Carregando fontes...</Text></View>; 
+  }
 
   const handleNext = (): void => {
     if (currentStepIndex < lessonParts.length - 1) {

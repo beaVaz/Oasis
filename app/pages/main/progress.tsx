@@ -1,130 +1,168 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { useFonts } from "expo-font";
-import StyleOfIndex from "../../../assets/style/home"; // Assumindo que home.jsx exporta estilos como default
-import { StyleSheet, View, Text, TouchableOpacity, Image, ScrollView, Dimensions, ImageBackground, ActivityIndicator, Platform } from "react-native";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  Platform,
+  Image,
+  ImageBackground,
+} from "react-native";
+import * as Animatable from "react-native-animatable";
+import { Calendar, LocaleConfig, MarkedDates } from "react-native-calendars";
 
-import ActivityCalendar from "../../../components/ActivityCalendar";
-import DayActivityDetails, { DetailedActivity } from "../../../components/DayActivityDetails";
+import DayActivityDetails, {
+  DetailedActivity,
+} from "../../../components/DayActivityDetails";
+import HomeStyle from "../../../assets/style/home";
 
 const coursesInProgress = [
-  { id: '1', title: 'React Native Avançado', progress: '50%', image: 'https://placehold.co/100x100' },
-  { id: '2', title: 'Introdução ao TypeScript', progress: '30%', image: 'https://placehold.co/100x100' },
-  { id: '3', title: 'UI/UX para Mobile', progress: '75%', image: 'https://placehold.co/100x100' },
-  { id: '4', title: 'Flutter Básico', progress: '20%', image: 'https://placehold.co/100x100' },
+  {
+    id: "1",
+    title: "React Native Avançado",
+    progress: "50%",
+    image: require("../../../assets/images/imagensTec/mountain-4694346_640.png"),
+  },
+  {
+    id: "2",
+    title: "Introdução ao TypeScript",
+    progress: "30%",
+    image: require("../../../assets/images/imagensTec/landscape-1844231_640.png"),
+  },
+  {
+    id: "3",
+    title: "UI/UX para Mobile",
+    progress: "75%",
+    image: require("../../../assets/images/imagensTec/landscape-1844226_640.png"),
+  },
+  {
+    id: "4",
+    title: "Flutter Básico",
+    progress: "20%",
+    image: require("../../../assets/images/imagensTec/ai-generated-8722240_640.png"),
+  },
 ];
 
-const API_BASE_URL = Platform.OS === 'android' ? 'http://10.0.2.2:3000/api' : 'http://localhost:3000/api';
-const USER_ID = '1'; // Simulação de ID do usuário
+const activitiesByDate: Record<string, DetailedActivity[]> = {
+  "2025-06-12": [
+    {
+      title: "Assistir aula de UI",
+      description: "Aula sobre design de interfaces no mobile",
+      completed: true,
+    },
+    {
+      title: "Quiz de TypeScript",
+      description: "Quiz de revisão do módulo",
+      completed: false,
+    },
+  ],
+  "2025-06-15": [
+    {
+      title: "Estudo React",
+      description: "Estudo de navegação com React Navigation",
+      completed: true,
+    },
+  ],
+};
+
+LocaleConfig.locales["pt-br"] = {
+  monthNames: [
+    "Janeiro",
+    "Fevereiro",
+    "Março",
+    "Abril",
+    "Maio",
+    "Junho",
+    "Julho",
+    "Agosto",
+    "Setembro",
+    "Outubro",
+    "Novembro",
+    "Dezembro",
+  ],
+  monthNamesShort: [
+    "Jan",
+    "Fev",
+    "Mar",
+    "Abr",
+    "Mai",
+    "Jun",
+    "Jul",
+    "Ago",
+    "Set",
+    "Out",
+    "Nov",
+    "Dez",
+  ],
+  dayNames: [
+    "Domingo",
+    "Segunda-feira",
+    "Terça-feira",
+    "Quarta-feira",
+    "Quinta-feira",
+    "Sexta-feira",
+    "Sábado",
+  ],
+  dayNamesShort: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
+  today: "Hoje",
+};
+LocaleConfig.defaultLocale = "pt-br";
 
 export default function ProgressScreen() {
-  const [fontsLoaded] = useFonts({
-    Poppins_Regular: require('../../../assets/fonts/poppins/Poppins-Regular.ttf'),
-    Poppins_Bold: require('../../../assets/fonts/poppins/Poppins-Bold.ttf'),
-    Poppins_SemiBold: require('../../../assets/fonts/poppins/Poppins-SemiBold.ttf'),
-  });
-
-  const [currentCalendarMonth, setCurrentCalendarMonth] = useState(new Date().toISOString().substring(0, 7));
-  const [markedDatesData, setMarkedDatesData] = useState({});
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [dayActivities, setDayActivities] = useState<DetailedActivity[] | null>(null);
-
-  const [isLoadingCalendar, setIsLoadingCalendar] = useState(false);
-  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
-  const [errorCalendar, setErrorCalendar] = useState<string | null>(null);
-  const [errorDetails, setErrorDetails] = useState<string | null>(null);
-
-  const fetchActivityCalendarData = useCallback(async (month: string) => {
-    setIsLoadingCalendar(true);
-    setErrorCalendar(null);
-    setMarkedDatesData({});
-    try {
-      const response = await fetch(`${API_BASE_URL}/user/activity-calendar?month=${month}&userId=${USER_ID}`);
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: `Erro HTTP: ${response.status}` }));
-        throw new Error(errorData.message || `Erro HTTP: ${response.status}`);
-      }
-      const data = await response.json();
-      setMarkedDatesData(data);
-    } catch (err: any) {
-      setErrorCalendar(err.message || 'Falha ao buscar dados do calendário.');
-      console.error("fetchActivityCalendarData error:", err);
-    } finally {
-      setIsLoadingCalendar(false);
-    }
-  }, []);
-
-  const fetchDayActivities = useCallback(async (date: string) => {
-    setIsLoadingDetails(true);
-    setErrorDetails(null);
-    setDayActivities(null);
-    try {
-      const response = await fetch(`${API_BASE_URL}/user/activities-by-date?date=${date}&userId=${USER_ID}`);
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: `Erro HTTP: ${response.status}` }));
-        throw new Error(errorData.message || `Erro HTTP: ${response.status}`);
-      }
-      const data = await response.json();
-      setDayActivities(data);
-    } catch (err: any) {
-      setErrorDetails(err.message || 'Falha ao buscar atividades do dia.');
-      console.error("fetchDayActivities error:", err);
-    } finally {
-      setIsLoadingDetails(false);
-    }
-  }, []);
+  const [markedDates, setMarkedDates] = useState<MarkedDates>({});
+  const [dayActivities, setDayActivities] = useState<DetailedActivity[]>([]);
 
   useEffect(() => {
-    if (fontsLoaded) {
-        fetchActivityCalendarData(currentCalendarMonth);
-    }
-  }, [currentCalendarMonth, fetchActivityCalendarData, fontsLoaded]);
+    const newMarkedDates: MarkedDates = {};
 
-  useEffect(() => {
-    if (selectedDate && fontsLoaded) {
-      fetchDayActivities(selectedDate);
-    } else if (!selectedDate) {
-      setDayActivities(null);
-      setErrorDetails(null); // Limpa também o erro de detalhes
-    }
-  }, [selectedDate, fetchDayActivities, fontsLoaded]);
+    Object.keys(activitiesByDate).forEach((date) => {
+      newMarkedDates[date] = {
+        dots: [{ key: "activity", color: "#1261D7" }],
+      };
+    });
 
-  const handleMonthChange = useCallback((newMonthString: string) => {
-    setCurrentCalendarMonth(newMonthString);
-    setSelectedDate(null);
-    setDayActivities(null);
-    setErrorDetails(null); // Limpa erro de detalhes ao mudar de mês
+    if (selectedDate) {
+      newMarkedDates[selectedDate] = {
+        selected: true,
+        selectedColor: "#1261D7",
+        dots: [{ key: "activity", color: "#fff" }],
+      };
+    }
+
+    setMarkedDates(newMarkedDates);
+    setDayActivities(selectedDate ? activitiesByDate[selectedDate] || [] : []);
+  }, [selectedDate]);
+
+  const onDaySelect = useCallback((date: string) => {
+    setSelectedDate((prev) => (prev === date ? null : date));
   }, []);
 
-  const handleDayPress = useCallback((dateString: string) => {
-    setSelectedDate(prevDate => (prevDate === dateString ? null : dateString));
-  }, []);
-
-  if (!fontsLoaded) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#1261D7" />
-        <Text style={{fontFamily: 'Poppins_Regular', marginTop: 10}}>Carregando fontes...</Text>
-      </View>
-    );
-  }
+  const formatDateBR = (isoDate: string) => {
+    const [year, month, day] = isoDate.split("-");
+    return `${day}/${month}/${year}`;
+  };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContentContainer}>
-      <View style={styles.headerContainer}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.scrollContentContainer}
+    >
+      <View style={styles.header}>
         <ImageBackground
-          source={require('@/assets/images/forma001.png')}
-          style={StyleOfIndex.forma001Back}
+          source={require("@/assets/images/forma001.png")}
+          style={HomeStyle.forma001Back}
           resizeMode="contain"
         />
         <ImageBackground
-          source={require('@/assets/images/forma004.png')}
-          style={StyleOfIndex.forma002Back}
+          source={require("@/assets/images/forma004.png")}
+          style={HomeStyle.forma002Back}
           resizeMode="contain"
         />
         <Text style={styles.title}>Meu Progresso e Atividades</Text>
         <View style={styles.imageContainer}>
           <Image
-            source={require('../../../assets/images/progress.png')}
+            source={require("../../../assets/images/progress.png")}
             style={styles.headerImage}
             resizeMode="contain"
           />
@@ -133,206 +171,243 @@ export default function ProgressScreen() {
 
       <View style={styles.calendarSection}>
         <Text style={styles.sectionTitle}>Calendário de Atividades</Text>
-        {isLoadingCalendar && <ActivityIndicator size="large" color="#1261D7" style={styles.loadingIndicator}/>}
-        {errorCalendar && !isLoadingCalendar && <Text style={styles.errorText}>Erro ao carregar calendário: {errorCalendar}</Text>}
-        {!isLoadingCalendar && !errorCalendar && (
-            <ActivityCalendar
-                current={currentCalendarMonth}
-                markedDates={markedDatesData}
-                onDayPress={handleDayPress}
-                onMonthChange={handleMonthChange}
-            />
+        <Calendar
+          onDayPress={(day) => onDaySelect(day.dateString)}
+          markedDates={markedDates}
+          markingType={"multi-dot"}
+          theme={{
+            selectedDayBackgroundColor: "#1261D7",
+            selectedDayTextColor: "#fff",
+            todayTextColor: "#1261D7",
+            arrowColor: "#1261D7",
+            monthTextColor: "#1261D7",
+            textDayFontFamily: "Poppins_Regular",
+            textMonthFontFamily: "Poppins_Bold",
+            textDayHeaderFontFamily: "Poppins_Bold",
+            textDayFontSize: 16,
+            textMonthFontSize: 18,
+            textDayHeaderFontSize: 14,
+          }}
+          firstDay={1}
+          enableSwipeMonths={true}
+          monthFormat={"MMMM yyyy"}
+        />
+        {selectedDate && (
+          <Animatable.Text
+            animation="bounceIn"
+            iterationCount={1}
+            style={styles.selectedDateText}
+          >
+            {`Data selecionada: ${formatDateBR(selectedDate)}`}
+          </Animatable.Text>
         )}
       </View>
 
-      {/* Seção de Detalhes da Atividade do Dia - renderizada apenas se uma data estiver selecionada */}
-      {selectedDate && (
-        <View style={styles.detailsSection}>
-          {isLoadingDetails && <ActivityIndicator size="large" color="#1261D7" style={styles.loadingIndicator}/>}
+      <View style={styles.activitiesSection}>
+        {selectedDate && dayActivities.length > 0 ? (
+          dayActivities.map((activity, i) => (
+            <Animatable.View
+              key={i}
+              animation="fadeInUp"
+              duration={500}
+              delay={i * 150}
+              style={styles.activityCard}
+            >
+              <Text style={styles.activityTitle}>{activity.title}</Text>
+              <Text style={styles.activityDescription}>
+                {activity.description}
+              </Text>
+              <Text
+                style={[
+                  styles.activityStatus,
+                  activity.completed ? styles.completed : styles.inProgress,
+                ]}
+              >
+                {activity.completed ? "✅ Concluída" : "⏳ Em andamento"}
+              </Text>
+            </Animatable.View>
+          ))
+        ) : selectedDate ? (
+          <View style={styles.noActivityContainer}>
+            <Text style={styles.noActivityText}>
+              Nenhuma atividade registrada para {formatDateBR(selectedDate)}.
+            </Text>
+          </View>
+        ) : null}
+      </View>
 
-          {!isLoadingDetails && errorDetails && (
-            <Text style={styles.errorText}>Erro ao carregar detalhes: {errorDetails}</Text>
-          )}
-
-          {!isLoadingDetails && !errorDetails && dayActivities && dayActivities.length > 0 && (
-            <DayActivityDetails
-              selectedDate={selectedDate}
-              activities={dayActivities}
-            />
-          )}
-
-          {!isLoadingDetails && !errorDetails && dayActivities && dayActivities.length === 0 && (
-             <View style={styles.noActivityContainer}>
-                <Text style={styles.noActivityText}>Nenhuma atividade registrada para {selectedDate}.</Text>
-             </View>
-           )}
-        </View>
-      )}
-
-      <View style={styles.courseListSection}>
+      <View style={styles.coursesSection}>
         <Text style={styles.sectionTitle}>Seus cursos em andamento</Text>
-        <View style={styles.courseList}>
-            <View style={styles.rowWrapper}>
-            {coursesInProgress.map((item) => (
-                <TouchableOpacity key={item.id} style={styles.courseCard}>
-                <Image source={{ uri: item.image }} style={styles.courseImage} />
-                <View style={styles.courseInfo}>
-                    <Text style={styles.courseTitle}>{item.title}</Text>
-                    <Text style={styles.courseProgress}>Progresso: {item.progress}</Text>
-                </View>
-                </TouchableOpacity>
-            ))}
+        {coursesInProgress.map((course) => (
+          <View key={course.id} style={styles.courseCard}>
+            <Image source={course.image} style={styles.courseImage} />
+            <View style={styles.courseInfo}>
+              <Text style={styles.courseTitle}>{course.title}</Text>
+              <Text style={styles.courseProgress}>
+                Progresso: {course.progress}
+              </Text>
             </View>
-        </View>
+          </View>
+        ))}
       </View>
     </ScrollView>
   );
 }
 
-const { height } = Dimensions.get("window");
-
 const styles = StyleSheet.create({
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-  },
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
   },
   scrollContentContainer: {
     paddingBottom: 20,
+    paddingHorizontal: 15,
   },
-  headerContainer: {
-    backgroundColor: '#fff',
+  header: {
+    backgroundColor: "#fff",
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
-    paddingTop: Platform.OS === 'android' ? 25 : 40,
+    paddingTop: Platform.OS === "android" ? 25 : 40,
     paddingBottom: 20,
     paddingHorizontal: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
     elevation: 4,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
   title: {
     fontSize: 24,
-    fontFamily: 'Poppins_Bold',
-    color: '#1261D7',
-    textAlign: 'center',
+    fontFamily: "Poppins_Bold",
+    color: "#1261D7",
+    textAlign: "center",
     marginTop: 10,
   },
   imageContainer: {
     marginTop: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   headerImage: {
     width: 200,
     height: 150,
   },
   calendarSection: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    paddingVertical: 10,
     paddingHorizontal: 15,
     marginBottom: 10,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    paddingVertical: 15,
-    marginHorizontal:10,
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
-  },
-  detailsSection: {
-    marginHorizontal:10,
-    marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 20,
-    fontFamily: 'Poppins_Bold',
-    color: '#333',
+    fontFamily: "Poppins_Bold",
+    color: "#333",
+    marginBottom: 10,
+  },
+  selectedDateText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#1261D7",
+    marginTop: 15,
+    textAlign: "center",
+  },
+  activitiesSection: {
+    marginBottom: 10,
+  },
+  activityCard: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 10,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  },
+  activityTitle: {
+    fontSize: 16,
+    fontFamily: "Poppins_Bold",
+    color: "#1261D7",
+    marginBottom: 6,
+  },
+  activityDescription: {
+    fontSize: 14,
+    fontFamily: "Poppins_Regular",
+    color: "#555",
+  },
+  activityStatus: {
+    marginTop: 10,
+    fontSize: 13,
+    fontFamily: "Poppins_Regular",
+  },
+  completed: {
+    color: "#2ecc71",
+  },
+  inProgress: {
+    color: "#f39c12",
+  },
+  coursesSection: {
     marginBottom: 15,
-    paddingLeft: 5,
   },
-  loadingIndicator: {
-    marginVertical: 20,
+  courseCard: {
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 10,
+    alignItems: "center",
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
   },
-  errorText: {
-    color: 'red',
-    textAlign: 'center',
-    marginVertical: 10,
-    fontFamily: 'Poppins_Regular',
-    paddingHorizontal: 10,
+  courseImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 10,
+    marginRight: 15,
+  },
+  courseInfo: {
+    flexShrink: 1,
+  },
+  courseTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    fontFamily: "Poppins_Regular",
+    color: "#1267D7",
+  },
+  courseProgress: {
+    fontSize: 14,
+    color: "#666",
+    marginTop: 4,
+    fontFamily: "Poppins_Regular",
   },
   noActivityContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
+    backgroundColor: "#fff",
+    borderRadius: 12,
     padding: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 2, // Consistente com outros cards
-    shadowColor: '#000',
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 2,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
-    marginTop: 5, // Pequena margem se DayActivityDetails não estiver presente
   },
   noActivityText: {
     fontSize: 14,
-    fontFamily: 'Poppins_Regular',
-    color: '#777',
-    textAlign: 'center',
-  },
-  courseListSection: {
-    paddingHorizontal: 15,
-    marginBottom: 20,
-  },
-  courseList: {
-    paddingBottom: 20,
-  },
-  rowWrapper: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  courseCard: {
-    width: '48%',
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 15,
-    alignItems: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
-  courseImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  courseInfo: {
-    alignItems: 'center',
-  },
-  courseTitle: {
-    fontSize: 15,
-    fontFamily: 'Poppins_SemiBold',
-    textAlign: 'center',
-    color: '#444',
-  },
-  courseProgress: {
-    fontSize: 13,
-    color: '#666',
-    marginTop: 4,
-    fontFamily: 'Poppins_Regular',
+    fontFamily: "Poppins_Regular",
+    color: "#777",
+    textAlign: "center",
   },
 });

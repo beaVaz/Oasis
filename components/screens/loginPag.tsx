@@ -38,14 +38,13 @@ export default function LoginScreen() {
         text2: 'Preencha todos os campos.',
         position: 'top',
       });
-      return; // Return here to prevent further execution
+      return;
     }
 
     try {
       const data = await loginUser({ email, password: password });
 
       if (!data.token) {
-        // This case might indicate a server-side issue not caught by typical error statuses
         Toast.show({
             type: 'error',
             text1: 'Erro de Login',
@@ -58,8 +57,7 @@ export default function LoginScreen() {
       await AsyncStorage.setItem('userToken', data.token);
 
       console.log('Login realizado com sucesso!');
-      // This is the redirect that needs to be preserved:
-      router.replace('/pages/main/EditProfileScreen'); 
+      router.replace('/pages/main/perfilUsuario'); 
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         const status = error.response?.status;
@@ -126,7 +124,7 @@ export default function LoginScreen() {
             placeholder="Email"
             keyboardType="email-address"
             autoCapitalize="none"
-            placeholderTextColor="#rgba(255,255,255,0.7)" // Added placeholder text color for consistency
+            placeholderTextColor="#rgba(255,255,255,0.7)" 
           />
           <View style={Estilo.boxInput}>
             <TextInput
@@ -136,20 +134,18 @@ export default function LoginScreen() {
               placeholder="Senha"
               secureTextEntry={!showPassword}
               keyboardType="default"
-              placeholderTextColor="#rgba(255,255,255,0.7)" // Added placeholder text color
+              placeholderTextColor="#rgba(255,255,255,0.7)" 
             />
-            {/* Ensure password state is used for length check */}
             {password.length > 0 && ( 
               <TouchableOpacity
                 onPress={() => setShowPassword(!showPassword)}
-                style={{ position: 'absolute', right: 10, top: 10 }} // Adjust styling as needed from Estilo.icon
+                style={{ position: 'absolute', right: 10, top: 10 }} 
               >
                 <Icon name={showPassword ? 'eye-slash' : 'eye'} size={24} color="#FFF" />
               </TouchableOpacity>
             )}
           </View>
 
-          {/* Changed Pressable to TouchableOpacity for consistency if desired, or keep Pressable */}
           <TouchableOpacity onPress={handleLogin}> 
             <View style={Estilo.enter}>
               <Text style={{ fontFamily: "Poppins_Bold", color: "#fff", fontSize: 20 }}>Entrar</Text>
